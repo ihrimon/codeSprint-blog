@@ -25,8 +25,8 @@ app.listen(3000, () => {
 });
 
 // API routes
-app.use("/user", userRoutes);
-app.use("/auth", authRoutes);
+app.use("/api/user", userRoutes);
+app.use("/api/auth", authRoutes);
 
 // handle internal error usign middleware
 app.use((error, req, res, next) => {
