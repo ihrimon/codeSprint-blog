@@ -1,12 +1,17 @@
 import { Alert, Button, Label, Spinner, TextInput } from "flowbite-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { signInStart, signInSuccess, signInFailure } from "../redux/user/userSlice";
 
 const SignIn = () => {
   const [formData, setFormData] = useState({});
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  // const [error, setError] = useState(null);
+  // const [loading, setLoading] = useState(false);
+  const {loading, error} = useSelector(state => state.user);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+
 
   const handleChange = (e) => {
     // console.log(e.target.value);
@@ -18,12 +23,14 @@ const SignIn = () => {
     e.preventDefault();
 
     if (!formData.email || !formData.password) {
-      return setError("Please fill out all fields");
+      // return setError("Please fill out all fields");
+      return dispatch(signInFailure("Please fill out all fields"));
     }
 
     try {
-      setLoading(true);
-      setError(null);
+      // setLoading(true);
+      // setError(null);
+      dispatch(signInStart());
       const res = await fetch("/api/auth/signin", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -32,16 +39,18 @@ const SignIn = () => {
       const data = await res.json();
 
       if (data.success === false) {
-        return setError(data.message);
+        dispatch(signInFailure(data.message))
       }
-      setLoading(false);
+      // setLoading(false);
 
       if (res.ok) {
+        dispatch(signInSuccess(data))
         navigate("/");
       }
     } catch (error) {
-      setError(error.message);
-      setLoading(false);
+      // setError(error.message);
+      // setLoading(false);
+      dispatch(signInFailure(error.message));
     }
   };
 
@@ -96,7 +105,7 @@ const SignIn = () => {
             </Button>
           </form>
           <div className="flex gap-2 text-sm mt-5">
-            <span>Don't have an account?</span>
+            <span>Do not have an account?</span>
             <Link to="/sign-up" className="text-blue-500">
               Sign up
             </Link>
